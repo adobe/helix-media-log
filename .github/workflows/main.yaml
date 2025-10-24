@@ -2,15 +2,16 @@ name: Build
 on: [push]
 
 env:
-  CI_BUILD_NUM: ${{ github.run_id }}
-  CI_BRANCH: ${{ github.ref_name }}
-  AWS_DEPLOY_ROLE: arn:aws:iam::282898975672:role/helix-role-github-actions
+  CIRCLE_BUILD_NUM: ${{ github.run_id }}
+  CIRCLE_BRANCH: ${{ github.ref_name }}
+  AWS_DEPLOY_ROLE: arn:aws:iam::118435662149:role/helix-gh-deploy-config-service
   AWS_DEPLOY_SECRET_ID: /helix/github-action-secrets
 
 permissions:
   id-token: write
   contents: write  # semantic-release-dry verifies the write permissions
   issues: read # needed by semantic-release
+  pull-requests: write # needed by semantic-release
 
 jobs:
   test:
@@ -18,10 +19,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Use Node.js 18.x
+      - name: Use Node.js 22.x
         uses: actions/setup-node@v4
         with:
-          node-version: '18.x'
+          node-version: '22.x'
       - run: npm install
       - run: npm test
       - uses: codecov/codecov-action@v4
@@ -42,7 +43,7 @@ jobs:
       - run: npm install
 
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v5
         with:
           aws-region: us-east-1
           role-to-assume: ${{ env.AWS_DEPLOY_ROLE }}
@@ -51,21 +52,16 @@ jobs:
         with:
           parse-json-secrets: true
           secret-ids: |
-            ${{ env.AWS_DEPLOY_SECRET_ID }}
+            ,${{ env.AWS_DEPLOY_SECRET_ID }}
       # see https://github.com/aws-actions/aws-secretsmanager-get-secrets/issues/11
-      - name: unprefix variables
-        run: |
-          for variable in "${!_HELIX_GITHUB_ACTION_SECRETS_@}"; do
-            echo "${variable#_HELIX_GITHUB_ACTION_SECRETS_}=${!variable}" >> $GITHUB_ENV
-          done
       - name: Branch Deployment
         run: npm run deploy-ci
+        env:
+          HLX_TEST_HEADERS: ${{ secrets.HLX_TEST_HEADERS }}
       - name: Post-Deployment Integration Test
         run: npm run test-postdeploy
-      - name: Semantic Release (Dry Run)
-        run: npm run semantic-release-dry
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          HLX_TEST_HEADERS: ${{ secrets.HLX_TEST_HEADERS }}
 
   release:
     name: Release
@@ -74,14 +70,14 @@ jobs:
     needs: test
     steps:
       - uses: actions/checkout@v4
-      - name: Use Node.js 18.x
+      - name: Use Node.js 22.x
         uses: actions/setup-node@v4
         with:
-          node-version: '18.x'
+          node-version: '22.x'
       - run: npm install
 
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v5
         with:
           aws-region: us-east-1
           role-to-assume: ${{ env.AWS_DEPLOY_ROLE }}
@@ -90,15 +86,10 @@ jobs:
         with:
           parse-json-secrets: true
           secret-ids: |
-            ${{ env.AWS_DEPLOY_SECRET_ID }}
-      # see https://github.com/aws-actions/aws-secretsmanager-get-secrets/issues/11
-      - name: unprefix variables
-        run: |
-          for variable in "${!_HELIX_GITHUB_ACTION_SECRETS_@}"; do
-            echo "${variable#_HELIX_GITHUB_ACTION_SECRETS_}=${!variable}" >> $GITHUB_ENV
-          done
+            ,${{ env.AWS_DEPLOY_SECRET_ID }}
 
       - name: Semantic Release
         run: npm run semantic-release
         env:
+          HLX_TEST_HEADERS: ${{ secrets.HLX_TEST_HEADERS }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
