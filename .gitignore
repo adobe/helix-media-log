@@ -63,3 +63,4 @@ secrets/*.pem
 # Test
 .wsk*
 deploy/**/*.zip
+test-results.xml
