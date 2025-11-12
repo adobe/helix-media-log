@@ -64,3 +64,4 @@ secrets/*.pem
 .wsk*
 deploy/**/*.zip
 test-results.xml
+.env
