@@ -1,8 +1,8 @@
 /*
- * Copyright 2020 Adobe. All rights reserved.
+ * Copyright 2025 Adobe. All rights reserved.
  * This file is licensed to you under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License. You may obtain a copy
- * of the License at http://www.apache.org/licenses/LICENSE-2.0
+ * of the License at https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software distributed under
  * the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS
@@ -20,13 +20,14 @@ export class OpenwhiskTarget {
   constructor(opts = {}) {
     Object.assign(this, {
       namespace: 'helix',
-      package: 'helix-services',
-      name: packjson.name.replace('@adobe/franklin-', ''),
+      package: 'helix3',
+      name: packjson.name.replace('@adobe/helix-', ''),
       version: String(packjson.version),
     }, opts);
-    if (process.env.CI && process.env.CI_BUILD_NUM && process.env.CI_BRANCH !== 'main' && !opts.version) {
-      this.version = `ci${process.env.CI_BUILD_NUM}`;
+    if (process.env.CI && process.env.CIRCLE_BUILD_NUM && process.env.CIRCLE_BRANCH !== 'main' && !opts.version) {
+      this.version = `ci${process.env.CIRCLE_BUILD_NUM}`;
     }
+    this.headers = process.env.HLX_TEST_HEADERS ? JSON.parse(process.env.HLX_TEST_HEADERS) : {};
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -43,17 +44,17 @@ export class OpenwhiskTarget {
     return `/api/v1/web/${this.namespace}/${this.package}/${this.name}@${this.version}`;
   }
 
+  // eslint-disable-next-line class-methods-use-this
+  enabled() {
+    return true;
+  }
+
   url(path, query) {
     const url = new URL(`${this.host()}${this.urlPath()}${path}`);
     if (query) {
       Object.entries(query).forEach(([name, value]) => url.searchParams.append(name, value));
     }
     return url;
-  }
-
-  // eslint-disable-next-line class-methods-use-this
-  enabled() {
-    return true;
   }
 }
 
@@ -97,7 +98,6 @@ export class GoogleTarget extends OpenwhiskTarget {
 }
 
 const ALL_TARGETS = [
-  // OpenwhiskTarget,
   AWSTarget,
   // GoogleTarget,
 ];
