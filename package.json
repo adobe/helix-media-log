@@ -1,6 +1,6 @@
 {
   "name": "@adobe/helix-media-log",
-  "version": "1.4.9",
+  "version": "1.0.0",
   "private": true,
   "description": "Helix Media Log",
   "main": "src/index.js",
@@ -19,11 +19,15 @@
     "prepare": "husky"
   },
   "wsk": {
-    "nodeVersion": 18,
-    "target": "aws",
-    "name": "helix-services/helix-media-log@${version}",
+    "nodeVersion": 22,
+    "name": "helix3/media-log@${version}",
+    "memory": 1024,
+    "#timeout": "5 minutes",
+    "timeout": "300000",
+    "awsRole!important": "arn:aws:iam::118435662149:role/helix-service-role-s3-rw",
     "testUrl": "/_status_check/healthcheck.json",
-    "memory": 256,
+    "awsAttachAuthorizer": "helix-token-authorizer_v2",
+    "target": "aws",
     "fastlyServiceId!important": ""
   },
   "mocha": {
