@@ -24,4 +24,3 @@ export default class DateFormat {
     return date.toISOString().substring(0, 19).replace(/[T:]/g, '-');
   }
 }
-

@@ -35,4 +35,3 @@ describe('DateFormat Tests', () => {
     assert.strictEqual(parsed.getTime(), original.getTime());
   });
 });
-
