@@ -19,7 +19,7 @@ async function run() {
     bundle: 'src/index.js',
     port: 3000,
   });
-  
+
   console.log(`Development server started on http://localhost:${server.port}`);
   console.log('\nTo test the media logger:');
   console.log('curl -X POST http://localhost:3000 \\');
