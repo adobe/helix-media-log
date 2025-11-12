@@ -18,14 +18,14 @@ jobs:
     name: Test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Use Node.js 22.x
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: '22.x'
       - run: npm install
       - run: npm test
-      - uses: codecov/codecov-action@v4
+      - uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
 
@@ -35,11 +35,11 @@ jobs:
     if: github.ref != 'refs/heads/main'
     needs: test
     steps:
-      - uses: actions/checkout@v4
-      - name: Use Node.js 18.x
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - name: Use Node.js 22.x
+        uses: actions/setup-node@v5
         with:
-          node-version: '18.x'
+          node-version: '22.x'
       - run: npm install
 
       - name: Configure AWS Credentials
@@ -53,7 +53,6 @@ jobs:
           parse-json-secrets: true
           secret-ids: |
             ,${{ env.AWS_DEPLOY_SECRET_ID }}
-      # see https://github.com/aws-actions/aws-secretsmanager-get-secrets/issues/11
       - name: Branch Deployment
         run: npm run deploy-ci
         env:
@@ -69,9 +68,9 @@ jobs:
     if: github.ref == 'refs/heads/main'
     needs: test
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Use Node.js 22.x
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: '22.x'
       - run: npm install

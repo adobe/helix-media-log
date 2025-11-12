@@ -6,15 +6,16 @@
   "main": "src/index.js",
   "type": "module",
   "scripts": {
-    "start": "nodemon",
-    "test": "c8 mocha  -i -g 'Post-Deploy' --spec=test/**/*.test.js",
-    "test-postdeploy": "mocha -g 'Post-Deploy' --spec=test/**/*.test.js",
+    "test": "c8 mocha  -i -g 'Post-Deploy'",
+    "test-postdeploy": "mocha -g 'Post-Deploy'",
     "lint": "eslint .",
     "semantic-release": "semantic-release",
+    "semantic-release-dry": "semantic-release --dry-run --branches $CI_BRANCH",
+    "commit": "git-cz",
     "build": "hedy -v",
     "deploy": "hedy -v --deploy --test",
     "deploy-routes": "hedy --no-build --no-hints -l major",
-    "deploy-ci": "hedy -v --deploy --test --pkgVersion=ci$CIRCLE_BUILD_NUM -l ci --cleanup-ci 24h",
+    "deploy-ci": "hedy -v --deploy --test --pkgVersion=ci$CI_BUILD_NUM -l ci --cleanup-ci 24h",
     "prepare": "husky"
   },
   "wsk": {
@@ -27,16 +28,11 @@
     "testUrl": "/_status_check/healthcheck.json",
     "awsAttachAuthorizer": "helix-token-authorizer_v2",
     "target": "aws",
-    "fastlyServiceId!important": "",
-    "dev": {
-      "params-file": "secrets/dev-secrets.json"
-    }
+    "fastlyServiceId!important": ""
   },
   "mocha": {
-    "require": [
-      "test/setup-env.js",
-      "mocha-suppress-logs"
-    ],
+    "spec": "test/**/*.test.js",
+    "require": "test/setup-env.js",
     "recursive": "true",
     "reporter": "mocha-multi-reporters",
     "reporter-options": "configFile=.mocha-multi.json"
@@ -93,16 +89,6 @@
   "lint-staged": {
     "*.js": "eslint",
     "*.cjs": "eslint"
-  },
-  "engines": {
-    "node": ">= 14.17"
-  },
-  "nodemonConfig": {
-    "exec": "node --inspect ./test/dev/server.mjs",
-    "watch": [
-      ".env",
-      "."
-    ],
-    "ext": ".js, .cjs, .ejs, .css"
+
   }
 }

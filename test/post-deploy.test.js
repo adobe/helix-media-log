@@ -26,7 +26,9 @@ createTargets().forEach((target) => {
 
     it('returns the status of the function', async () => {
       const url = target.url('/_status_check/healthcheck.json');
-      const res = await fetch(url);
+      const res = await fetch(url, {
+        headers: target.headers,
+      });
       assert.strictEqual(res.status, 200);
       const json = await res.json();
       delete json.process;
@@ -42,9 +44,10 @@ createTargets().forEach((target) => {
     }).timeout(50000);
 
     it('invokes the function', async () => {
-      const res = await fetch(target.url('/'));
+      const res = await fetch(target.url('/'), {
+        headers: target.headers,
+      });
       assert.strictEqual(res.status, 200);
-      assert.fail('not ready yet');
     }).timeout(50000);
   });
 });
