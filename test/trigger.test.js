@@ -63,19 +63,14 @@ describe('SQS trigger tests', () => {
       body: JSON.stringify({
         contentBusId,
         updates: [{
-          owner: 'owner',
-          repo: 'repo',
-          ref: 'ref',
-          result: {
-            timestamp: 1722427281000,
-            operation: 'ingest',
-            mediaHash: '13872adbc8f226c65c00a81078b84ab4152476fc7',
-            contentType: 'image/png',
-            user: 'uncled@adobe.com',
-            path: '/docs/faq',
-            originalFilename: 'original-filename.png',
-            contentSourceType: 'gdoc-preview',
-          },
+          timestamp: 1722427281000,
+          operation: 'ingest',
+          mediaHash: '13872adbc8f226c65c00a81078b84ab4152476fc7',
+          contentType: 'image/png',
+          user: 'uncled@adobe.com',
+          path: '/docs/faq',
+          originalFilename: 'original-filename.png',
+          contentSourceType: 'gdoc-preview',
         }],
       }),
     }];
@@ -111,19 +106,14 @@ describe('SQS trigger tests', () => {
       .reply(200, {
         contentBusId,
         updates: [{
-          owner: 'owner',
-          repo: 'repo',
-          ref: 'ref',
-          result: {
-            timestamp: 1722427282000,
-            operation: 'reuse',
-            mediaHash: '13872adbc8f226c65c00a81078b84ab4152476fc7',
-            contentType: 'image/png',
-            user: 'tripod@adobe.com',
-            path: '/drafts/tripod/docs/faq',
-            originalFilename: 'original-filename.png',
-            contentSourceType: 'gdoc-preview',
-          },
+          timestamp: 1722427282000,
+          operation: 'reuse',
+          mediaHash: '13872adbc8f226c65c00a81078b84ab4152476fc7',
+          contentType: 'image/png',
+          user: 'tripod@adobe.com',
+          path: '/drafts/tripod/docs/faq',
+          originalFilename: 'original-filename.png',
+          contentSourceType: 'gdoc-preview',
         }],
       })
       .delete('/some/swap/key?x-id=DeleteObject')
@@ -158,19 +148,14 @@ describe('SQS trigger tests', () => {
       body: JSON.stringify({
         contentBusId,
         updates: [{
-          owner: 'owner',
-          repo: 'repo',
-          ref: 'ref',
-          result: {
-            timestamp: 1722427281000,
-            operation: 'ingest',
-            mediaHash: '13872adbc8f226c65c00a81078b84ab4152476fc7',
-            contentType: 'image/png',
-            user: 'uncled@adobe.com',
-            path: '/docs/faq',
-            originalFilename: 'original-filename.png',
-            contentSourceType: 'gdoc-preview',
-          },
+          timestamp: 1722427281000,
+          operation: 'ingest',
+          mediaHash: '13872adbc8f226c65c00a81078b84ab4152476fc7',
+          contentType: 'image/png',
+          user: 'uncled@adobe.com',
+          path: '/docs/faq',
+          originalFilename: 'original-filename.png',
+          contentSourceType: 'gdoc-preview',
         }],
       }),
     }];

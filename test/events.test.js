@@ -92,11 +92,11 @@ describe('AWS EventBridge invocation', () => {
 
     assert.deepStrictEqual(sent, [
       {
-        MessageBody: `{"key":"${contentBusId1}","updates":[{"contentBusId":"${contentBusId1}","timestamp":1722427281000,"operation":"ingest","mediaHash":"13872adbc8f226c65c00a81078b84ab4152476fc7","contentType":"image/png","user":"uncled@adobe.com","path":"/docs/faq","originalFilename":"original-filename.png","contentSourceType":"gdoc-preview"},{"contentBusId":"${contentBusId1}","timestamp":1722427282000,"operation":"reuse","mediaHash":"13872adbc8f226c65c00a81078b84ab4152476fc7","contentType":"image/png","user":"tripod@adobe.com","path":"/drafts/tripod/docs/faq","originalFilename":"original-filename.png","contentSourceType":"gdoc-preview"}]}`,
+        MessageBody: `{"contentBusId":"${contentBusId1}","updates":[{"timestamp":1722427281000,"operation":"ingest","mediaHash":"13872adbc8f226c65c00a81078b84ab4152476fc7","contentType":"image/png","user":"uncled@adobe.com","path":"/docs/faq","originalFilename":"original-filename.png","contentSourceType":"gdoc-preview"},{"timestamp":1722427282000,"operation":"reuse","mediaHash":"13872adbc8f226c65c00a81078b84ab4152476fc7","contentType":"image/png","user":"tripod@adobe.com","path":"/drafts/tripod/docs/faq","originalFilename":"original-filename.png","contentSourceType":"gdoc-preview"}]}`,
         MessageGroupId: contentBusId1,
       },
       {
-        MessageBody: `{"key":"${contentBusId2}","updates":[{"contentBusId":"${contentBusId2}","timestamp":1722427283000,"operation":"ingest","mediaHash":"23872adbc8f226c65c00a81078b84ab4152476fc7","contentType":"image/jpeg","user":"admin@adobe.com","path":"/images/hero","originalFilename":"hero.jpg","contentSourceType":"onedrive"}]}`,
+        MessageBody: `{"contentBusId":"${contentBusId2}","updates":[{"timestamp":1722427283000,"operation":"ingest","mediaHash":"23872adbc8f226c65c00a81078b84ab4152476fc7","contentType":"image/jpeg","user":"admin@adobe.com","path":"/images/hero","originalFilename":"hero.jpg","contentSourceType":"onedrive"}]}`,
         MessageGroupId: contentBusId2,
       },
     ]);
@@ -158,11 +158,11 @@ describe('AWS EventBridge invocation', () => {
 
     assert.deepStrictEqual(sent, [
       {
-        MessageBody: `{"key":"${contentBusId1}","updates":[{"contentBusId":"${contentBusId1}","timestamp":1722427281000,"operation":"ingest","mediaHash":"13872adbc8f226c65c00a81078b84ab4152476fc7","contentType":"image/png","user":"uncled@adobe.com","path":"/docs/faq","originalFilename":"original-filename.png","contentSourceType":"gdoc-preview"},{"contentBusId":"${contentBusId1}","timestamp":1722427282000,"operation":"reuse","mediaHash":"13872adbc8f226c65c00a81078b84ab4152476fc7","contentType":"image/png","user":"tripod@adobe.com","path":"/drafts/tripod/docs/faq","originalFilename":"original-filename.png","contentSourceType":"gdoc-preview"}]}`,
+        MessageBody: `{"contentBusId":"${contentBusId1}","updates":[{"timestamp":1722427281000,"operation":"ingest","mediaHash":"13872adbc8f226c65c00a81078b84ab4152476fc7","contentType":"image/png","user":"uncled@adobe.com","path":"/docs/faq","originalFilename":"original-filename.png","contentSourceType":"gdoc-preview"},{"timestamp":1722427282000,"operation":"reuse","mediaHash":"13872adbc8f226c65c00a81078b84ab4152476fc7","contentType":"image/png","user":"tripod@adobe.com","path":"/drafts/tripod/docs/faq","originalFilename":"original-filename.png","contentSourceType":"gdoc-preview"}]}`,
         MessageGroupId: contentBusId1,
       },
       {
-        MessageBody: `{"key":"${contentBusId2}","updates":[{"contentBusId":"${contentBusId2}","timestamp":1722427283000,"operation":"ingest","mediaHash":"23872adbc8f226c65c00a81078b84ab4152476fc7","contentType":"image/jpeg","user":"admin@adobe.com","path":"/images/hero","originalFilename":"hero.jpg","contentSourceType":"onedrive"}]}`,
+        MessageBody: `{"contentBusId":"${contentBusId2}","updates":[{"timestamp":1722427283000,"operation":"ingest","mediaHash":"23872adbc8f226c65c00a81078b84ab4152476fc7","contentType":"image/jpeg","user":"admin@adobe.com","path":"/images/hero","originalFilename":"hero.jpg","contentSourceType":"onedrive"}]}`,
         MessageGroupId: contentBusId2,
       },
     ]);

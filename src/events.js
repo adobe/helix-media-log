@@ -67,12 +67,14 @@ function addMessage(message, key, projects) {
   let project = projects[key];
   if (!project) {
     project = {
-      key, updates: [],
+      contentBusId: key, updates: [],
     };
     // eslint-disable-next-line no-param-reassign
     projects[key] = project;
   }
-  project.updates.push(message);
+  // Remove contentBusId from the update since it's already at the message body level
+  const { contentBusId, ...update } = message;
+  project.updates.push(update);
 }
 
 /**
@@ -128,11 +130,11 @@ async function doRun(context) {
 
   // construct the payload for the FIFO messages. 1 per project
   const payloads = Object.values(projects).map((project) => {
-    const { key } = project;
+    const { contentBusId } = project;
     const body = JSON.stringify(project);
-    log.info(`created batched message for ${key}, ${project.updates.length} updates, ${hsize(body.length)}`);
+    log.info(`created batched message for ${contentBusId}, ${project.updates.length} updates, ${hsize(body.length)}`);
     return {
-      MessageGroupId: key,
+      MessageGroupId: contentBusId,
       MessageDeduplicationId: crypto.randomUUID(), // probably don't need message-deduplication
       MessageBody: body,
     };

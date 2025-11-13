@@ -28,11 +28,7 @@ async function processUpdates(context, contentBusId, updates) {
   });
 
   try {
-    const objectName = await mediaLog.append(updates.map(({
-      result,
-    }) => ({
-      ...result,
-    })));
+    const objectName = await mediaLog.append(updates);
     log.info(`[${ID}] appended ${updates.length} media events to: ${objectName}`);
   } finally {
     mediaLog.close();
