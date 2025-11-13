@@ -59,8 +59,7 @@ function generateID() {
 export default class MediaLog {
   constructor(opts) {
     this.s3 = opts.s3;
-    this.org = opts.org;
-    this.site = opts.site;
+    this.contentBusId = opts.contentBusId;
     this.log = opts.log;
   }
 
@@ -77,13 +76,13 @@ export default class MediaLog {
    * Fetch index file
    */
   async #fetchIndex() {
-    const { org, site, s3 } = this;
+    const { contentBusId, s3 } = this;
 
     // fetch name of last log object
     try {
       const res = await s3.send(new GetObjectCommand({
         Bucket: BUCKET_NAME,
-        Key: `${org}/${site}/${INDEX_FILE}`,
+        Key: `${contentBusId}/${INDEX_FILE}`,
       }));
       const logContents = await new Response(res.Body, {}).text();
       return logContents.split('\n');
@@ -130,14 +129,14 @@ export default class MediaLog {
    * @returns an object containing a key and contents
    */
   async getOrCreateLogObject() {
-    const { org, site, s3 } = this;
+    const { contentBusId, s3 } = this;
 
     // fetch list of log files
     const logFiles = await this.#fetchIndex();
 
     // fetch contents of last log object
     if (logFiles.length) {
-      const key = `${org}/${site}/${logFiles[logFiles.length - 1]}`;
+      const key = `${contentBusId}/${logFiles[logFiles.length - 1]}`;
       const logFile = await this.#fetchLogFile(key);
       if (logFile) {
         return logFile;
@@ -150,9 +149,9 @@ export default class MediaLog {
       Body: logFiles.join('\n'),
       Bucket: BUCKET_NAME,
       ContentType: 'text/plain',
-      Key: `${org}/${site}/${INDEX_FILE}`,
+      Key: `${contentBusId}/${INDEX_FILE}`,
     }));
-    return { key: `${org}/${site}/${logFiles[logFiles.length - 1]}`, contents: [] };
+    return { key: `${contentBusId}/${logFiles[logFiles.length - 1]}`, contents: [] };
   }
 
   /**
@@ -183,11 +182,11 @@ export default class MediaLog {
    */
   static async create(context, opts) {
     const { log } = context;
-    const { org, site } = opts;
+    const { contentBusId } = opts;
 
     const s3 = await MediaLog.createClient();
     return new MediaLog({
-      s3, org, site, log,
+      s3, contentBusId, log,
     });
   }
 

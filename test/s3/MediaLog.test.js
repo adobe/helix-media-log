@@ -55,136 +55,142 @@ describe('S3 MediaLog tests', () => {
 
   it('Create media logger and append data', async () => {
     const contents = await gzip(JSON.stringify([]));
+    const contentBusId = '355d601dd9b577248658b2b9ec3a9d7ddbc57b4428da7b8e532ab5aed6f';
 
     nock('https://helix-media-logs.s3.us-east-1.amazonaws.com')
-      .get('/org/site/.index?x-id=GetObject')
+      .get(`/${contentBusId}/.index?x-id=GetObject`)
       .reply(200, '2024-07-31-12-01-21-3ADD0B52867FF57D', {
         'content-type': 'text/plain',
       })
-      .get('/org/site/2024-07-31-12-01-21-3ADD0B52867FF57D.gz?x-id=GetObject')
+      .get(`/${contentBusId}/2024-07-31-12-01-21-3ADD0B52867FF57D.gz?x-id=GetObject`)
       .reply(200, contents, {
         'content-type': 'application/json',
         'content-length': contents.length,
         'content-encoding': 'gzip',
       })
-      .put('/org/site/2024-07-31-12-01-21-3ADD0B52867FF57D.gz?x-id=PutObject')
+      .put(`/${contentBusId}/2024-07-31-12-01-21-3ADD0B52867FF57D.gz?x-id=PutObject`)
       .reply(function (_, body) {
         assert.strictEqual(this.req.headers['x-amz-meta-last-event-time'], '2024-07-31-12-01-21');
         assert.deepStrictEqual(body, updates);
         return [201];
       });
 
-    const mediaLog = await MediaLog.create(DEFAULT_CONTEXT(), { org: 'org', site: 'site' });
+    const mediaLog = await MediaLog.create(DEFAULT_CONTEXT(), { contentBusId });
     await mediaLog.append(updates);
   });
 
   it('Simulate pristine environment', async () => {
     let lastLog;
+    const contentBusId = '355d601dd9b577248658b2b9ec3a9d7ddbc57b4428da7b8e532ab5aed6f';
 
     nock('https://helix-media-logs.s3.us-east-1.amazonaws.com')
-      .get('/org/site/.index?x-id=GetObject')
+      .get(`/${contentBusId}/.index?x-id=GetObject`)
       .reply(404, new xml2js.Builder().buildObject({
         Error: {
           Code: 'NoSuchKey',
           Message: 'The specified key does not exist.',
-          Key: '/org/site/.index',
+          Key: `/${contentBusId}/.index`,
         },
       }))
-      .put('/org/site/.index?x-id=PutObject')
+      .put(`/${contentBusId}/.index?x-id=PutObject`)
       .reply((_, body) => {
         const logFiles = body.split('\n');
         lastLog = logFiles[logFiles.length - 1];
         return [201];
       })
-      .put((uri) => uri.startsWith(`/org/site/${lastLog}`))
+      .put((uri) => uri.startsWith(`/${contentBusId}/${lastLog}`))
       .reply(201);
 
-    const mediaLog = await MediaLog.create(DEFAULT_CONTEXT(), { org: 'org', site: 'site' });
+    const mediaLog = await MediaLog.create(DEFAULT_CONTEXT(), { contentBusId });
     await mediaLog.append(updates);
   });
 
   it('Simulate environment where last log has no .gz extension', async () => {
     let lastLog;
+    const contentBusId = '355d601dd9b577248658b2b9ec3a9d7ddbc57b4428da7b8e532ab5aed6f';
 
     nock('https://helix-media-logs.s3.us-east-1.amazonaws.com')
-      .get('/org/site/.index?x-id=GetObject')
+      .get(`/${contentBusId}/.index?x-id=GetObject`)
       .reply(200, '2024-07-31-12-01-21-3ADD0B52867FF57D', {
         'content-type': 'text/plain',
       })
-      .get('/org/site/2024-07-31-12-01-21-3ADD0B52867FF57D.gz?x-id=GetObject')
+      .get(`/${contentBusId}/2024-07-31-12-01-21-3ADD0B52867FF57D.gz?x-id=GetObject`)
       .reply(404, new xml2js.Builder().buildObject({
         Error: {
           Code: 'NoSuchKey',
           Message: 'The specified key does not exist.',
-          Key: '/org/site/2024-07-31-12-01-21-3ADD0B52867FF57D.gz',
+          Key: `/${contentBusId}/2024-07-31-12-01-21-3ADD0B52867FF57D.gz`,
         },
       }))
-      .put('/org/site/.index?x-id=PutObject')
+      .put(`/${contentBusId}/.index?x-id=PutObject`)
       .reply((_, body) => {
         const logFiles = body.split('\n');
         lastLog = logFiles[logFiles.length - 1];
         return [201];
       })
-      .put((uri) => uri.startsWith(`/org/site/${lastLog}.gz`))
+      .put((uri) => uri.startsWith(`/${contentBusId}/${lastLog}.gz`))
       .reply(201);
 
-    const mediaLog = await MediaLog.create(DEFAULT_CONTEXT(), { org: 'org', site: 'site' });
+    const mediaLog = await MediaLog.create(DEFAULT_CONTEXT(), { contentBusId });
     await mediaLog.append(updates);
   });
 
   it('Simulate environment where last log is too large', async () => {
     const contents = await gzip(JSON.stringify([]));
     let lastLog;
+    const contentBusId = '355d601dd9b577248658b2b9ec3a9d7ddbc57b4428da7b8e532ab5aed6f';
 
     nock('https://helix-media-logs.s3.us-east-1.amazonaws.com')
-      .get('/org/site/.index?x-id=GetObject')
+      .get(`/${contentBusId}/.index?x-id=GetObject`)
       .reply(200, '2024-07-31-12-01-21-3ADD0B52867FF57D', {
         'content-type': 'text/plain',
       })
-      .get('/org/site/2024-07-31-12-01-21-3ADD0B52867FF57D.gz?x-id=GetObject')
+      .get(`/${contentBusId}/2024-07-31-12-01-21-3ADD0B52867FF57D.gz?x-id=GetObject`)
       .reply(200, contents, {
         'content-type': 'application/json',
         'content-length': 700000,
         'content-encoding': 'gzip',
       })
-      .put('/org/site/.index?x-id=PutObject')
+      .put(`/${contentBusId}/.index?x-id=PutObject`)
       .reply((_, body) => {
         const logFiles = body.split('\n');
         assert.strictEqual(logFiles.length, 2);
         lastLog = logFiles[logFiles.length - 1];
         return [201];
       })
-      .put((uri) => uri.startsWith(`/org/site/${lastLog}.gz`))
+      .put((uri) => uri.startsWith(`/${contentBusId}/${lastLog}.gz`))
       .reply(201);
 
-    const mediaLog = await MediaLog.create(DEFAULT_CONTEXT(), { org: 'org', site: 'site' });
+    const mediaLog = await MediaLog.create(DEFAULT_CONTEXT(), { contentBusId });
     await mediaLog.append(updates);
   });
 
   it('Return null when no updates provided', async () => {
-    const mediaLog = await MediaLog.create(DEFAULT_CONTEXT(), { org: 'org', site: 'site' });
+    const contentBusId = '355d601dd9b577248658b2b9ec3a9d7ddbc57b4428da7b8e532ab5aed6f';
+    const mediaLog = await MediaLog.create(DEFAULT_CONTEXT(), { contentBusId });
     const result = await mediaLog.append([]);
     assert.strictEqual(result, null);
   });
 
-  it('Handle org-level logging with wildcard site', async () => {
+  it('Handle contentBusId-based logging', async () => {
     const contents = await gzip(JSON.stringify([]));
+    const contentBusId = '355d601dd9b577248658b2b9ec3a9d7ddbc57b4428da7b8e532ab5aed6f';
 
     nock('https://helix-media-logs.s3.us-east-1.amazonaws.com')
-      .get('/org/%2A/.index?x-id=GetObject')
+      .get(`/${contentBusId}/.index?x-id=GetObject`)
       .reply(200, '2024-07-31-12-01-21-ABC123', {
         'content-type': 'text/plain',
       })
-      .get('/org/%2A/2024-07-31-12-01-21-ABC123.gz?x-id=GetObject')
+      .get(`/${contentBusId}/2024-07-31-12-01-21-ABC123.gz?x-id=GetObject`)
       .reply(200, contents, {
         'content-type': 'application/json',
         'content-length': contents.length,
         'content-encoding': 'gzip',
       })
-      .put('/org/%2A/2024-07-31-12-01-21-ABC123.gz?x-id=PutObject')
+      .put(`/${contentBusId}/2024-07-31-12-01-21-ABC123.gz?x-id=PutObject`)
       .reply(201);
 
-    const mediaLog = await MediaLog.create(DEFAULT_CONTEXT(), { org: 'org', site: '*' });
+    const mediaLog = await MediaLog.create(DEFAULT_CONTEXT(), { contentBusId });
     await mediaLog.append(updates);
   });
 });

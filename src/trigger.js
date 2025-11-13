@@ -14,26 +14,24 @@ import { Response } from '@adobe/fetch';
 import MediaLog from './s3/MediaLog.js';
 
 /**
- * Processes the record updates per project
+ * Processes the record updates per contentBusId
  *
  * @param {import('@adobe/helix-universal').UniversalContext} context request context
- * @param {string} key org/site combination, site possibly '*'
+ * @param {string} contentBusId content bus ID
  * @param {object[]} updates updates
  * @returns {Promise<void>}
  */
-async function processUpdates(context, key, updates) {
+async function processUpdates(context, contentBusId, updates) {
   const { log, attributes: { messageId: ID } } = context;
-  const [destOrg, destSite] = key.split('/');
   const mediaLog = await MediaLog.create(context, {
-    org: destOrg,
-    site: destSite !== '*' ? destSite : '*',
+    contentBusId,
   });
 
   try {
     const objectName = await mediaLog.append(updates.map(({
-      org, site, owner, repo, ref, result,
+      result,
     }) => ({
-      ...result, org, site, owner, repo, ref,
+      ...result,
     })));
     log.info(`[${ID}] appended ${updates.length} media events to: ${objectName}`);
   } finally {
@@ -57,12 +55,12 @@ function s3InputFromURL(s3Url) {
 /**
  * Deserialize a message that was stored by BatchedQueueClient
  * @param {import('@adobe/helix-universal').UniversalContext} context context
- * @param {string} key key
+ * @param {string} contentBusId content bus ID
  * @param {string} s3Url S3 URL
  * @param {any} message message
  * @returns deserialized object with a `body` property
  */
-async function deserialize(context, key, s3Url, message) {
+async function deserialize(context, contentBusId, s3Url, message) {
   const { log, attributes: { messageId: ID } } = context;
 
   try {
@@ -70,21 +68,21 @@ async function deserialize(context, key, s3Url, message) {
     const input = s3InputFromURL(s3Url);
     const result = await s3.send(new GetObjectCommand(input));
     const body = await new Response(result.Body, {}).text();
-    log.info(`[${ID}][${key}] serialized message downloaded from: ${s3Url}`);
+    log.info(`[${ID}][${contentBusId}] serialized message downloaded from: ${s3Url}`);
 
     // hack to cleanup serialized message
     // eslint-disable-next-line no-param-reassign
     message.cleanup = async () => {
       await s3.send(new DeleteObjectCommand(input));
-      log.info(`[${ID}][${key}] deleted serialized message from: ${s3Url}`);
+      log.info(`[${ID}][${contentBusId}] deleted serialized message from: ${s3Url}`);
     };
     return {
       body,
     };
   } catch (e) {
-    log.error(`[${ID}][${key}] error deserializing records from ${s3Url}: ${e.message}`, e);
+    log.error(`[${ID}][${contentBusId}] error deserializing records from ${s3Url}: ${e.message}`, e);
     return {
-      body: JSON.stringify({ key }),
+      body: JSON.stringify({ contentBusId }),
     };
   }
 }
@@ -100,19 +98,19 @@ async function processMessage(context, message) {
   const body = JSON.parse(message.body);
 
   const {
-    swapS3Url, key, updates,
+    swapS3Url, contentBusId, updates,
   } = body;
 
   const { messageId: ID } = context.attributes;
   if (swapS3Url) {
-    log.info(`[${ID}][${key}] message was swapped out to: ${swapS3Url}`);
-    const newMsg = await deserialize(context, key, swapS3Url, message);
+    log.info(`[${ID}][${contentBusId}] message was swapped out to: ${swapS3Url}`);
+    const newMsg = await deserialize(context, contentBusId, swapS3Url, message);
     await processMessage(context, newMsg);
   } else if (updates) {
-    log.debug(`[${ID}][${key}] received updates: ${JSON.stringify(updates, 0, 2)}`);
-    await processUpdates(context, key, updates);
+    log.debug(`[${ID}][${contentBusId}] received updates: ${JSON.stringify(updates, 0, 2)}`);
+    await processUpdates(context, contentBusId, updates);
   } else {
-    log.warn(`[${ID}][${key}] no updates found.`);
+    log.warn(`[${ID}][${contentBusId}] no updates found.`);
   }
 }
 

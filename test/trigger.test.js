@@ -39,19 +39,16 @@ describe('SQS trigger tests', () => {
   });
 
   it('Process normal message', async () => {
+    const contentBusId = '355d601dd9b577248658b2b9ec3a9d7ddbc57b4428da7b8e532ab5aed6f';
+
     stub.returns({
       append: (updates) => {
         assert.deepStrictEqual(updates, [{
           timestamp: 1722427281000,
           operation: 'ingest',
           mediaHash: 'test-hash',
-          org: 'org',
-          site: 'site',
-          owner: 'owner',
-          repo: 'repo',
-          ref: 'ref',
         }]);
-        return 'org/site/log';
+        return `${contentBusId}/log`;
       },
       close: () => {},
     });
@@ -59,10 +56,8 @@ describe('SQS trigger tests', () => {
     const messages = [{
       messageId: '374cec7b-d0c8-4a2e-ad0b-67be763cf97e',
       body: JSON.stringify({
-        key: 'org/site',
+        contentBusId,
         updates: [{
-          org: 'org',
-          site: 'site',
           owner: 'owner',
           repo: 'repo',
           ref: 'ref',
@@ -82,20 +77,16 @@ describe('SQS trigger tests', () => {
   });
 
   it('Process serialized message', async () => {
-    // verify site will be set to `*`
+    const contentBusId = '355d601dd9b577248658b2b9ec3a9d7ddbc57b4428da7b8e532ab5aed6f';
+
     stub.returns({
       append: (updates) => {
         assert.deepStrictEqual(updates, [{
           timestamp: 1722427281000,
           operation: 'reuse',
           mediaHash: 'test-hash-2',
-          org: 'org',
-          site: 'site',
-          owner: 'owner',
-          repo: 'repo',
-          ref: 'ref',
         }]);
-        return 'org/*/log';
+        return `${contentBusId}/log`;
       },
       close: () => {},
     });
@@ -103,10 +94,8 @@ describe('SQS trigger tests', () => {
     nock('https://helix-content-bus.s3.us-east-1.amazonaws.com')
       .get('/some/swap/key?x-id=GetObject')
       .reply(200, {
-        key: 'org/*',
+        contentBusId,
         updates: [{
-          org: 'org',
-          site: 'site',
           owner: 'owner',
           repo: 'repo',
           ref: 'ref',
@@ -122,7 +111,7 @@ describe('SQS trigger tests', () => {
 
     const messages = [{
       body: JSON.stringify({
-        key: 'org/*',
+        contentBusId,
         owner: undefined,
         repo: undefined,
         swapS3Url: 's3://helix-content-bus/some/swap/key',
@@ -136,6 +125,8 @@ describe('SQS trigger tests', () => {
   });
 
   it('Process a failure to append', async () => {
+    const contentBusId = '355d601dd9b577248658b2b9ec3a9d7ddbc57b4428da7b8e532ab5aed6f';
+
     stub.returns({
       append: () => {
         throw new Error('Whoopsie');
@@ -145,10 +136,8 @@ describe('SQS trigger tests', () => {
 
     const messages = [{
       body: JSON.stringify({
-        key: 'org/site',
+        contentBusId,
         updates: [{
-          org: 'org',
-          site: 'site',
           owner: 'owner',
           repo: 'repo',
           ref: 'ref',
@@ -168,9 +157,11 @@ describe('SQS trigger tests', () => {
   });
 
   it('Reports error in deserializing', async () => {
+    const contentBusId = '355d601dd9b577248658b2b9ec3a9d7ddbc57b4428da7b8e532ab5aed6f';
+
     const messages = [{
       body: JSON.stringify({
-        owner: 'owner', repo: 'repo', key: 'owner/repo/media', swapS3Url: 's3://helix-content-bus/some/swap/key',
+        owner: 'owner', repo: 'repo', contentBusId, swapS3Url: 's3://helix-content-bus/some/swap/key',
       }),
     }];
     nock('https://helix-content-bus.s3.us-east-1.amazonaws.com')
@@ -181,14 +172,16 @@ describe('SQS trigger tests', () => {
   });
 
   it('Processes message with no updates', async () => {
+    const contentBusId = '355d601dd9b577248658b2b9ec3a9d7ddbc57b4428da7b8e532ab5aed6f';
+
     stub.returns({
-      append: () => 'org/site/log',
+      append: () => `${contentBusId}/log`,
       close: () => {},
     });
 
     const messages = [{
       body: JSON.stringify({
-        key: 'org/site',
+        contentBusId,
       }),
     }];
     const response = await trigger(DEFAULT_CONTEXT(), messages);
