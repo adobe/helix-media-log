@@ -32,7 +32,7 @@ describe('AWS EventBridge invocation', () => {
 
   it('returns response', async () => {
     const receiveStub = sinon.stub(BatchedQueueClient.prototype, 'receive').returns([]);
-    const result = await events(DEFAULT_CONTEXT({ HLX_MEDIA_LOGGING_ORGS: 'not json' }));
+    const result = await events(DEFAULT_CONTEXT());
     assert.strictEqual(await result.text(), 'Received 0 messages from queue.');
     assert.deepStrictEqual(receiveStub.getCall(0).args, [
       30,
@@ -60,7 +60,7 @@ describe('AWS EventBridge invocation', () => {
     const sendStub = sinon.stub(BatchedQueueClient.prototype, 'send');
     const deleteStub = sinon.stub(BatchedQueueClient.prototype, 'delete');
 
-    const result = await events(DEFAULT_CONTEXT({ HLX_MEDIA_LOGGING_ORGS: '["org2"]' }));
+    const result = await events(DEFAULT_CONTEXT());
     assert.strictEqual(await result.text(), 'Received 3 messages from queue.');
 
     const sent = sendStub.getCall(0).args[0].filter((msg) => {
@@ -77,10 +77,6 @@ describe('AWS EventBridge invocation', () => {
       {
         MessageBody: '{"key":"org2/site2","updates":[{"org":"org2","site":"site2","owner":"owner-2","repo":"repo-1"}]}',
         MessageGroupId: 'org2/site2',
-      },
-      {
-        MessageBody: '{"key":"org2/*","updates":[{"org":"org2","site":"site2","owner":"owner-2","repo":"repo-1"}]}',
-        MessageGroupId: 'org2/*',
       },
     ]);
 
