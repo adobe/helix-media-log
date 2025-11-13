@@ -15,10 +15,9 @@
 The Helix Media Log service collects, processes, and stores media activity notifications for Adobe Helix projects. It tracks whenever media items (images, videos, documents, etc.) are added, updated, or deleted in the MediaBus system.
 
 **Key Features:**
-- **Automatic Batching**: Groups media events by organization/site for efficient processing
+- **Automatic Batching**: Groups media events by content bus ID for efficient processing
 - **Scalable Architecture**: Uses AWS Lambda, SQS, and S3 for automatic scaling
 - **Compressed Storage**: Stores logs as gzipped JSON files in S3
-- **Organization-Level Logging**: Optional aggregated logs for entire organizations
 - **Large Message Support**: Automatically handles messages exceeding SQS limits
 
 For detailed architecture and implementation details, see [PROJECT_OVERVIEW.md](PROJECT_OVERVIEW.md).
@@ -94,98 +93,53 @@ Services should publish media events to the `helix-media-log` SQS queue:
 
 ```json
 {
-  "org": "adobe",
-  "site": "blog",
-  "ref": "main",
-  "result": {
-    "timestamp": 1705320000000,
-    "mediaId": "img-12345",
-    "action": "add",
-    "path": "/media/hero-image.jpg",
-    "mimeType": "image/jpeg",
-    "size": 245760,
-    "user": "editor@adobe.com"
-  }
+  "contentBusId": "355d601dd9b577248658b2b9ec3a9d7ddbc57b4428da7b8e532ab5aed6f",
+  "timestamp": 1722427281000,
+  "operation": "ingest",
+  "mediaHash": "13872adbc8f226c65c00a81078b84ab4152476fc7",
+  "mimeType": "image/png",
+  "user": "editor@adobe.com",
+  "path": "/docs/faq",
+  "originalFilename": "hero-image.png",
+  "source": "gdoc-preview"
 }
 ```
 
-### Media Event Types
+### Media Event Fields
 
-**Add Media**:
-```json
-{
-  "action": "add",
-  "mediaId": "img-12345",
-  "path": "/media/image.jpg",
-  "mimeType": "image/jpeg",
-  "size": 245760,
-  "timestamp": 1705320000000,
-  "user": "user@example.com"
-}
-```
+- **`contentBusId`** (required): Unique identifier for the content bus (used for grouping and log organization)
+- **`timestamp`** (required): Unix timestamp in milliseconds when the event occurred
+- **`operation`** (required): Type of operation (`ingest`, `reuse`, `delete`, etc.)
+- **`mediaHash`** (required): Unique hash identifier for the media item
+- **`mimeType`** (required): MIME type of the media (e.g., `image/png`, `image/jpeg`)
+- **`user`** (required): Email or identifier of the user who performed the action
+- **`path`** (required): Path where the media is stored or referenced
+- **`originalFilename`** (optional): Original filename of the media
+- **`source`** (optional): Source system that generated the event (e.g., `gdoc-preview`, `onedrive`)
 
-**Update Media**:
-```json
-{
-  "action": "update",
-  "mediaId": "img-12345",
-  "path": "/media/image.jpg",
-  "previousVersion": "v1",
-  "timestamp": 1705320000000,
-  "user": "user@example.com"
-}
-```
-
-**Delete Media**:
-```json
-{
-  "action": "delete",
-  "mediaId": "img-12345",
-  "path": "/media/image.jpg",
-  "reason": "outdated",
-  "timestamp": 1705320000000,
-  "user": "user@example.com"
-}
-```
-
-### Organization-Level Logging
-
-To enable organization-wide aggregate logs, set the `HLX_MEDIA_LOGGING_ORGS` environment variable:
-
-```bash
-aws lambda update-function-configuration \
-  --function-name helix3--media-log:v1 \
-  --environment "Variables={HLX_MEDIA_LOGGING_ORGS='[\"adobe\",\"microsoft\"]'}"
-```
-
-This will create logs in both:
-- `s3://helix-media-logs/org/site/` (site-specific)
-- `s3://helix-media-logs/org/*/` (organization-wide)
 
 ### Accessing Logs
 
-Logs are stored in S3 at `s3://helix-media-logs/`:
+Logs are stored in S3 at `s3://helix-media-logs/` organized by content bus ID:
 
 ```
 helix-media-logs/
-├── adobe/
-│   ├── blog/
-│   │   ├── .index
-│   │   ├── 2024-01-15-10-30-45-ABC123.gz
-│   │   └── 2024-01-15-12-00-00-DEF456.gz
-│   └── docs/
-│       └── ...
-└── microsoft/
-    └── ...
+├── 355d601dd9b577248658b2b9ec3a9d7ddbc57b4428da7b8e532ab5aed6f/
+│   ├── .index
+│   ├── 2024-01-15-10-30-45-ABC123.gz
+│   └── 2024-01-15-12-00-00-DEF456.gz
+├── 455d601dd9b577248658b2b9ec3a9d7ddbc57b4428da7b8e532ab5aed6f/
+│   └── ...
+└── ...
 ```
 
 **Reading Logs**:
 ```bash
 # Download and decompress
-aws s3 cp s3://helix-media-logs/adobe/blog/2024-01-15-10-30-45-ABC123.gz - | gunzip | jq .
+aws s3 cp s3://helix-media-logs/355d601dd9b577248658b2b9ec3a9d7ddbc57b4428da7b8e532ab5aed6f/2024-01-15-10-30-45-ABC123.gz - | gunzip | jq .
 
-# List all logs for a site
-aws s3 ls s3://helix-media-logs/adobe/blog/
+# List all logs for a content bus
+aws s3 ls s3://helix-media-logs/355d601dd9b577248658b2b9ec3a9d7ddbc57b4428da7b8e532ab5aed6f/
 ```
 
 ## Development
@@ -208,7 +162,7 @@ curl -X POST localhost:3000 \
   -H 'Content-Type: application/json' \
   -d '[{
     "messageId": "msg-0",
-    "body": "{\"org\":\"test\",\"site\":\"site\",\"updates\":[{\"timestamp\":1705320000000,\"mediaId\":\"test-123\",\"action\":\"add\",\"path\":\"/test.jpg\"}]}"
+    "body": "{\"contentBusId\":\"355d601dd9b577248658b2b9ec3a9d7ddbc57b4428da7b8e532ab5aed6f\",\"updates\":[{\"timestamp\":1722427281000,\"operation\":\"ingest\",\"mediaHash\":\"13872adbc8f226c65c00a81078b84ab4152476fc7\",\"mimeType\":\"image/png\",\"user\":\"editor@adobe.com\",\"path\":\"/test.jpg\",\"originalFilename\":\"test.png\",\"source\":\"gdoc-preview\"}]}"
   }]'
 ```
 
@@ -231,7 +185,6 @@ npm run deploy              # Deploy to AWS
 
 ### Environment Variables
 
-- **`HLX_MEDIA_LOGGING_ORGS`**: JSON array of organizations for org-level logging
 - **`HLX_DEV_SERVER_HOST`**: Set when running locally
 
 ### Lambda Configuration

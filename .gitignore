@@ -65,3 +65,4 @@ secrets/*.pem
 deploy/**/*.zip
 test-results.xml
 .env
+.claude/settings.local.json
