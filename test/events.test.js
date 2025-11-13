@@ -42,19 +42,40 @@ describe('AWS EventBridge invocation', () => {
   });
 
   it('processes messages sent by SNS', async () => {
-    const createMsg = (org, site, owner, repo) => ({
+    const createMsg = (
+      contentBusId,
+      timestamp,
+      operation,
+      mediaHash,
+      contentType,
+      user,
+      path,
+      originalFilename,
+      contentSourceType,
+    ) => ({
       Body: JSON.stringify({
         Message: JSON.stringify({
-          org, site, owner, repo,
+          contentBusId,
+          timestamp,
+          operation,
+          mediaHash,
+          contentType,
+          user,
+          path,
+          originalFilename,
+          contentSourceType,
         }),
         TopicArn: 'arn:aws:sns:us-east-1:012345789012:helix-media-test',
       }),
     });
 
+    const contentBusId1 = '355d601dd9b577248658b2b9ec3a9d7ddbc57b4428da7b8e532ab5aed6f';
+    const contentBusId2 = '455d601dd9b577248658b2b9ec3a9d7ddbc57b4428da7b8e532ab5aed6f';
+
     sinon.stub(BatchedQueueClient.prototype, 'receive').returns([
-      createMsg('org1', 'site1', 'owner-1', 'repo-1'),
-      createMsg('org1', 'site1', 'owner-1', 'repo-1'),
-      createMsg('org2', 'site2', 'owner-2', 'repo-1'),
+      createMsg(contentBusId1, 1722427281000, 'ingest', '13872adbc8f226c65c00a81078b84ab4152476fc7', 'image/png', 'uncled@adobe.com', '/docs/faq', 'original-filename.png', 'gdoc-preview'),
+      createMsg(contentBusId1, 1722427282000, 'reuse', '13872adbc8f226c65c00a81078b84ab4152476fc7', 'image/png', 'tripod@adobe.com', '/drafts/tripod/docs/faq', 'original-filename.png', 'gdoc-preview'),
+      createMsg(contentBusId2, 1722427283000, 'ingest', '23872adbc8f226c65c00a81078b84ab4152476fc7', 'image/jpeg', 'admin@adobe.com', '/images/hero', 'hero.jpg', 'onedrive'),
     ]);
 
     const sendStub = sinon.stub(BatchedQueueClient.prototype, 'send');
@@ -71,35 +92,56 @@ describe('AWS EventBridge invocation', () => {
 
     assert.deepStrictEqual(sent, [
       {
-        MessageBody: '{"key":"org1/site1","updates":[{"org":"org1","site":"site1","owner":"owner-1","repo":"repo-1"},{"org":"org1","site":"site1","owner":"owner-1","repo":"repo-1"}]}',
-        MessageGroupId: 'org1/site1',
+        MessageBody: `{"key":"${contentBusId1}","updates":[{"contentBusId":"${contentBusId1}","timestamp":1722427281000,"operation":"ingest","mediaHash":"13872adbc8f226c65c00a81078b84ab4152476fc7","contentType":"image/png","user":"uncled@adobe.com","path":"/docs/faq","originalFilename":"original-filename.png","contentSourceType":"gdoc-preview"},{"contentBusId":"${contentBusId1}","timestamp":1722427282000,"operation":"reuse","mediaHash":"13872adbc8f226c65c00a81078b84ab4152476fc7","contentType":"image/png","user":"tripod@adobe.com","path":"/drafts/tripod/docs/faq","originalFilename":"original-filename.png","contentSourceType":"gdoc-preview"}]}`,
+        MessageGroupId: contentBusId1,
       },
       {
-        MessageBody: '{"key":"org2/site2","updates":[{"org":"org2","site":"site2","owner":"owner-2","repo":"repo-1"}]}',
-        MessageGroupId: 'org2/site2',
+        MessageBody: `{"key":"${contentBusId2}","updates":[{"contentBusId":"${contentBusId2}","timestamp":1722427283000,"operation":"ingest","mediaHash":"23872adbc8f226c65c00a81078b84ab4152476fc7","contentType":"image/jpeg","user":"admin@adobe.com","path":"/images/hero","originalFilename":"hero.jpg","contentSourceType":"onedrive"}]}`,
+        MessageGroupId: contentBusId2,
       },
     ]);
 
     assert.deepStrictEqual(deleteStub.getCall(0).args, [
       [
-        { Body: '{"Message":"{\\"org\\":\\"org1\\",\\"site\\":\\"site1\\",\\"owner\\":\\"owner-1\\",\\"repo\\":\\"repo-1\\"}","TopicArn":"arn:aws:sns:us-east-1:012345789012:helix-media-test"}' },
-        { Body: '{"Message":"{\\"org\\":\\"org1\\",\\"site\\":\\"site1\\",\\"owner\\":\\"owner-1\\",\\"repo\\":\\"repo-1\\"}","TopicArn":"arn:aws:sns:us-east-1:012345789012:helix-media-test"}' },
-        { Body: '{"Message":"{\\"org\\":\\"org2\\",\\"site\\":\\"site2\\",\\"owner\\":\\"owner-2\\",\\"repo\\":\\"repo-1\\"}","TopicArn":"arn:aws:sns:us-east-1:012345789012:helix-media-test"}' },
+        { Body: `{"Message":"{\\"contentBusId\\":\\"${contentBusId1}\\",\\"timestamp\\":1722427281000,\\"operation\\":\\"ingest\\",\\"mediaHash\\":\\"13872adbc8f226c65c00a81078b84ab4152476fc7\\",\\"contentType\\":\\"image/png\\",\\"user\\":\\"uncled@adobe.com\\",\\"path\\":\\"/docs/faq\\",\\"originalFilename\\":\\"original-filename.png\\",\\"contentSourceType\\":\\"gdoc-preview\\"}","TopicArn":"arn:aws:sns:us-east-1:012345789012:helix-media-test"}` },
+        { Body: `{"Message":"{\\"contentBusId\\":\\"${contentBusId1}\\",\\"timestamp\\":1722427282000,\\"operation\\":\\"reuse\\",\\"mediaHash\\":\\"13872adbc8f226c65c00a81078b84ab4152476fc7\\",\\"contentType\\":\\"image/png\\",\\"user\\":\\"tripod@adobe.com\\",\\"path\\":\\"/drafts/tripod/docs/faq\\",\\"originalFilename\\":\\"original-filename.png\\",\\"contentSourceType\\":\\"gdoc-preview\\"}","TopicArn":"arn:aws:sns:us-east-1:012345789012:helix-media-test"}` },
+        { Body: `{"Message":"{\\"contentBusId\\":\\"${contentBusId2}\\",\\"timestamp\\":1722427283000,\\"operation\\":\\"ingest\\",\\"mediaHash\\":\\"23872adbc8f226c65c00a81078b84ab4152476fc7\\",\\"contentType\\":\\"image/jpeg\\",\\"user\\":\\"admin@adobe.com\\",\\"path\\":\\"/images/hero\\",\\"originalFilename\\":\\"hero.jpg\\",\\"contentSourceType\\":\\"onedrive\\"}","TopicArn":"arn:aws:sns:us-east-1:012345789012:helix-media-test"}` },
       ],
     ]);
   });
 
-  it('processes messages sent by SQS, and adds missing org/site', async () => {
-    const createMsg = (owner, repo) => ({
+  it('processes messages sent by SQS', async () => {
+    const createMsg = (
+      contentBusId,
+      timestamp,
+      operation,
+      mediaHash,
+      contentType,
+      user,
+      path,
+      originalFilename,
+      contentSourceType,
+    ) => ({
       Body: JSON.stringify({
-        owner, repo,
+        contentBusId,
+        timestamp,
+        operation,
+        mediaHash,
+        contentType,
+        user,
+        path,
+        originalFilename,
+        contentSourceType,
       }),
     });
 
+    const contentBusId1 = '355d601dd9b577248658b2b9ec3a9d7ddbc57b4428da7b8e532ab5aed6f';
+    const contentBusId2 = '455d601dd9b577248658b2b9ec3a9d7ddbc57b4428da7b8e532ab5aed6f';
+
     sinon.stub(BatchedQueueClient.prototype, 'receive').returns([
-      createMsg('owner-1', 'repo-1'),
-      createMsg('owner-1', 'repo-1'),
-      createMsg('owner-1', 'repo-2'),
+      createMsg(contentBusId1, 1722427281000, 'ingest', '13872adbc8f226c65c00a81078b84ab4152476fc7', 'image/png', 'uncled@adobe.com', '/docs/faq', 'original-filename.png', 'gdoc-preview'),
+      createMsg(contentBusId1, 1722427282000, 'reuse', '13872adbc8f226c65c00a81078b84ab4152476fc7', 'image/png', 'tripod@adobe.com', '/drafts/tripod/docs/faq', 'original-filename.png', 'gdoc-preview'),
+      createMsg(contentBusId2, 1722427283000, 'ingest', '23872adbc8f226c65c00a81078b84ab4152476fc7', 'image/jpeg', 'admin@adobe.com', '/images/hero', 'hero.jpg', 'onedrive'),
     ]);
 
     const sendStub = sinon.stub(BatchedQueueClient.prototype, 'send');
@@ -116,20 +158,20 @@ describe('AWS EventBridge invocation', () => {
 
     assert.deepStrictEqual(sent, [
       {
-        MessageBody: '{"key":"owner-1/repo-1","updates":[{"owner":"owner-1","repo":"repo-1","org":"owner-1","site":"repo-1"},{"owner":"owner-1","repo":"repo-1","org":"owner-1","site":"repo-1"}]}',
-        MessageGroupId: 'owner-1/repo-1',
+        MessageBody: `{"key":"${contentBusId1}","updates":[{"contentBusId":"${contentBusId1}","timestamp":1722427281000,"operation":"ingest","mediaHash":"13872adbc8f226c65c00a81078b84ab4152476fc7","contentType":"image/png","user":"uncled@adobe.com","path":"/docs/faq","originalFilename":"original-filename.png","contentSourceType":"gdoc-preview"},{"contentBusId":"${contentBusId1}","timestamp":1722427282000,"operation":"reuse","mediaHash":"13872adbc8f226c65c00a81078b84ab4152476fc7","contentType":"image/png","user":"tripod@adobe.com","path":"/drafts/tripod/docs/faq","originalFilename":"original-filename.png","contentSourceType":"gdoc-preview"}]}`,
+        MessageGroupId: contentBusId1,
       },
       {
-        MessageBody: '{"key":"owner-1/repo-2","updates":[{"owner":"owner-1","repo":"repo-2","org":"owner-1","site":"repo-2"}]}',
-        MessageGroupId: 'owner-1/repo-2',
+        MessageBody: `{"key":"${contentBusId2}","updates":[{"contentBusId":"${contentBusId2}","timestamp":1722427283000,"operation":"ingest","mediaHash":"23872adbc8f226c65c00a81078b84ab4152476fc7","contentType":"image/jpeg","user":"admin@adobe.com","path":"/images/hero","originalFilename":"hero.jpg","contentSourceType":"onedrive"}]}`,
+        MessageGroupId: contentBusId2,
       },
     ]);
 
     assert.deepStrictEqual(deleteStub.getCall(0).args, [
       [
-        { Body: '{"owner":"owner-1","repo":"repo-1"}' },
-        { Body: '{"owner":"owner-1","repo":"repo-1"}' },
-        { Body: '{"owner":"owner-1","repo":"repo-2"}' },
+        { Body: `{"contentBusId":"${contentBusId1}","timestamp":1722427281000,"operation":"ingest","mediaHash":"13872adbc8f226c65c00a81078b84ab4152476fc7","contentType":"image/png","user":"uncled@adobe.com","path":"/docs/faq","originalFilename":"original-filename.png","contentSourceType":"gdoc-preview"}` },
+        { Body: `{"contentBusId":"${contentBusId1}","timestamp":1722427282000,"operation":"reuse","mediaHash":"13872adbc8f226c65c00a81078b84ab4152476fc7","contentType":"image/png","user":"tripod@adobe.com","path":"/drafts/tripod/docs/faq","originalFilename":"original-filename.png","contentSourceType":"gdoc-preview"}` },
+        { Body: `{"contentBusId":"${contentBusId2}","timestamp":1722427283000,"operation":"ingest","mediaHash":"23872adbc8f226c65c00a81078b84ab4152476fc7","contentType":"image/jpeg","user":"admin@adobe.com","path":"/images/hero","originalFilename":"hero.jpg","contentSourceType":"onedrive"}` },
       ],
     ]);
   });

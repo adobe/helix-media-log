@@ -43,7 +43,7 @@ describe('S3 MediaLog tests', () => {
   });
 
   const updates = [{
-    timestamp: 1722427281000,
+    timestamp: 1722427281000, // 2025-07-31T12:01:21.000
     operation: 'ingest',
     mediaHash: '13872adbc8f226c65c00a81078b84ab4152476fc7',
     contentType: 'image/png',

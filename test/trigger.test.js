@@ -44,9 +44,14 @@ describe('SQS trigger tests', () => {
     stub.returns({
       append: (updates) => {
         assert.deepStrictEqual(updates, [{
-          timestamp: 1722427281000,
+          timestamp: 1722427281000, // 2025-07-31T12:01:21.000
           operation: 'ingest',
-          mediaHash: 'test-hash',
+          mediaHash: '13872adbc8f226c65c00a81078b84ab4152476fc7',
+          contentType: 'image/png',
+          user: 'uncled@adobe.com',
+          path: '/docs/faq',
+          originalFilename: 'original-filename.png',
+          contentSourceType: 'gdoc-preview',
         }]);
         return `${contentBusId}/log`;
       },
@@ -64,7 +69,12 @@ describe('SQS trigger tests', () => {
           result: {
             timestamp: 1722427281000,
             operation: 'ingest',
-            mediaHash: 'test-hash',
+            mediaHash: '13872adbc8f226c65c00a81078b84ab4152476fc7',
+            contentType: 'image/png',
+            user: 'uncled@adobe.com',
+            path: '/docs/faq',
+            originalFilename: 'original-filename.png',
+            contentSourceType: 'gdoc-preview',
           },
         }],
       }),
@@ -82,9 +92,14 @@ describe('SQS trigger tests', () => {
     stub.returns({
       append: (updates) => {
         assert.deepStrictEqual(updates, [{
-          timestamp: 1722427281000,
+          timestamp: 1722427282000, // 2025-07-31T12:01:22.000
           operation: 'reuse',
-          mediaHash: 'test-hash-2',
+          mediaHash: '13872adbc8f226c65c00a81078b84ab4152476fc7',
+          contentType: 'image/png',
+          user: 'tripod@adobe.com',
+          path: '/drafts/tripod/docs/faq',
+          originalFilename: 'original-filename.png',
+          contentSourceType: 'gdoc-preview',
         }]);
         return `${contentBusId}/log`;
       },
@@ -100,9 +115,14 @@ describe('SQS trigger tests', () => {
           repo: 'repo',
           ref: 'ref',
           result: {
-            timestamp: 1722427281000,
+            timestamp: 1722427282000,
             operation: 'reuse',
-            mediaHash: 'test-hash-2',
+            mediaHash: '13872adbc8f226c65c00a81078b84ab4152476fc7',
+            contentType: 'image/png',
+            user: 'tripod@adobe.com',
+            path: '/drafts/tripod/docs/faq',
+            originalFilename: 'original-filename.png',
+            contentSourceType: 'gdoc-preview',
           },
         }],
       })
@@ -144,7 +164,12 @@ describe('SQS trigger tests', () => {
           result: {
             timestamp: 1722427281000,
             operation: 'ingest',
-            mediaHash: 'test-hash',
+            mediaHash: '13872adbc8f226c65c00a81078b84ab4152476fc7',
+            contentType: 'image/png',
+            user: 'uncled@adobe.com',
+            path: '/docs/faq',
+            originalFilename: 'original-filename.png',
+            contentSourceType: 'gdoc-preview',
           },
         }],
       }),

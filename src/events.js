@@ -111,16 +111,12 @@ async function doRun(context) {
         message = body;
       }
 
-      // fallback to owner and repo for messages that don't have org and site
-      if (!message.org && !message.site) {
-        message = {
-          ...message,
-          org: message.owner,
-          site: message.repo,
-        };
+      const { contentBusId } = message;
+      if (contentBusId) {
+        addMessage(message, contentBusId, projects);
+      } else {
+        log.warn(`message ${msg.MessageId} missing contentBusId, skipping`);
       }
-      const { org, site } = message;
-      addMessage(message, `${org}/${site}`, projects);
 
       // if (loggingOrgs.includes(org)) {
       //   addMessage(message, `${org}/*`, projects);
