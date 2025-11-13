@@ -13,7 +13,7 @@ import wrap from '@adobe/helix-shared-wrap';
 import { helixStatus } from '@adobe/helix-status';
 import { Response } from '@adobe/fetch';
 import bodyData from '@adobe/helix-shared-body-data';
-import secrets from '@adobe/helix-shared-secrets';
+// import secrets from '@adobe/helix-shared-secrets';
 import events from './events.js';
 import trigger from './trigger.js';
 
@@ -47,5 +47,4 @@ async function run(request, context) {
 
 export const main = wrap(run)
   .with(bodyData)
-  .with(secrets)
   .with(helixStatus);

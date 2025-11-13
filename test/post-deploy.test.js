@@ -46,14 +46,12 @@ createTargets().forEach((target) => {
     }).timeout(50000);
 
     it('invokes the function', async () => {
-      console.log('invoking the function', target.url('/'));
       const url = target.url('/');
       const res = await fetch(url, {
         headers: {
           ...target.headers,
         },
       });
-      console.log('response', res);
       assert.strictEqual(res.status, 400);
     }).timeout(50000);
   });

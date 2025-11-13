@@ -40,20 +40,20 @@ export function getOutputQueue(region, accountId, test) {
  * Return the list of organizations that have root
  * org logging enabled.
  */
-function getLoggingOrgs(context) {
-  const { env: { HLX_MEDIA_LOGGING_ORGS: json }, log } = context;
-  if (json) {
-    try {
-      const orgs = JSON.parse(json);
-      if (Array.isArray(orgs)) {
-        return orgs;
-      }
-    } catch (e) {
-      log.warn(`error evaluating ${json} for HLX_MEDIA_LOGGING_ORGS`, e);
-    }
-  }
-  return [];
-}
+// function getLoggingOrgs(context) {
+//   const { env: { HLX_MEDIA_LOGGING_ORGS: json }, log } = context;
+//   if (json) {
+//     try {
+//       const orgs = JSON.parse(json);
+//       if (Array.isArray(orgs)) {
+//         return orgs;
+//       }
+//     } catch (e) {
+//       log.warn(`error evaluating ${json} for HLX_MEDIA_LOGGING_ORGS`, e);
+//     }
+//   }
+//   return [];
+// }
 
 /**
  * Add a single message to the updates for a project, given
@@ -84,7 +84,7 @@ function addMessage(message, key, projects) {
  */
 async function doRun(context) {
   const { runtime: { region, accountId }, log } = context;
-  const loggingOrgs = getLoggingOrgs(context);
+  // const loggingOrgs = getLoggingOrgs(context);
   const test = !!process.env.HLX_DEV_SERVER_HOST;
 
   const client = new BatchedQueueClient({
@@ -122,9 +122,9 @@ async function doRun(context) {
       const { org, site } = message;
       addMessage(message, `${org}/${site}`, projects);
 
-      if (loggingOrgs.includes(org)) {
-        addMessage(message, `${org}/*`, projects);
-      }
+      // if (loggingOrgs.includes(org)) {
+      //   addMessage(message, `${org}/*`, projects);
+      // }
     } catch (e) {
       log.warn(`error processing message ${msg.MessageId}: ${e.message}`);
     }
