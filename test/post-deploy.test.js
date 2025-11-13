@@ -53,6 +53,7 @@ createTargets().forEach((target) => {
           ...target.headers,
         },
       });
+      console.log('response', res);
       assert.strictEqual(res.status, 400);
     }).timeout(50000);
   });
