@@ -91,14 +91,11 @@ async function deserialize(context, contentBusId, s3Url, message) {
  */
 async function processMessage(context, message) {
   const { log } = context;
-  log.info(`[TRIGGER] Processing message: ${JSON.stringify(message.body || message).substring(0, 500)}`);
   const body = JSON.parse(message.body);
 
   const {
     swapS3Url, contentBusId, updates,
   } = body;
-
-  log.info(`[TRIGGER] Parsed body - contentBusId: ${contentBusId}, swapS3Url: ${swapS3Url}, updates: ${updates ? updates.length : 0}`);
 
   const { messageId: ID } = context.attributes;
   if (swapS3Url) {
@@ -106,7 +103,6 @@ async function processMessage(context, message) {
     const newMsg = await deserialize(context, contentBusId, swapS3Url, message);
     await processMessage(context, newMsg);
   } else if (updates) {
-    log.info(`[${ID}][${contentBusId}] received updates: ${JSON.stringify(updates, 0, 2)}`);
     await processUpdates(context, contentBusId, updates);
   } else {
     log.warn(`[${ID}][${contentBusId}] no updates found in message body: ${JSON.stringify(body)}`);
@@ -127,8 +123,7 @@ async function doRun(context, messages) {
   if (messages.length > 1) {
     log.warn('More than 1 message received. Ensure to set batch-size to 1 in SQS trigger, otherwise you risk too long processing times.');
   }
-  log.info(`[TRIGGER] Processing ${messages.length} records`);
-  log.info(`[TRIGGER] First message sample: ${JSON.stringify(messages[0] || {}).substring(0, 500)}`);
+  log.info(`Processing ${messages.length} records`);
   const ret = {
     batchItemFailures: [],
   };
@@ -138,23 +133,20 @@ async function doRun(context, messages) {
       context.attributes = context.attributes ?? {};
       context.attributes.messageId = (message.messageId ?? crypto.randomUUID()).substring(0, 8);
 
-      log.info(`[TRIGGER] Processing message ${context.attributes.messageId}`);
       // eslint-disable-next-line no-await-in-loop
       await processMessage(context, message);
       if (message.cleanup) {
         // eslint-disable-next-line no-await-in-loop
         await message.cleanup();
       }
-      log.info(`[TRIGGER] Successfully processed message ${context.attributes.messageId}`);
     } catch (e) {
-      log.error(`[TRIGGER] Error processing record ${message.messageId}: ${e.message}`);
-      log.error(`[TRIGGER] Stack trace: ${e.stack}`);
+      log.error(`Error processing record ${message.messageId}: ${e.message}`);
+      log.error(`Stack trace: ${e.stack}`);
       ret.batchItemFailures.push({
         itemIdentifier: message.messageId,
       });
     }
   }
-  log.info(`[TRIGGER] Finished processing. Failures: ${ret.batchItemFailures.length}`);
   return ret;
 }
 

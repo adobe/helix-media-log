@@ -197,22 +197,17 @@ export default class MediaLog {
    * @returns {Promise<string>} key of the log file
    */
   async append(updates) {
-    this.log.info(`[MediaLog] append called with ${updates.length} updates`);
     if (updates.length) {
-      this.log.info(`[MediaLog] Getting or creating log object for contentBusId: ${this.contentBusId}`);
       const { key, contents } = await this.getOrCreateLogObject();
-      this.log.info(`[MediaLog] Got log object with key: ${key}, existing contents: ${contents.length}`);
       const lastEventTime = updates[updates.length - 1].timestamp;
       contents.push(...updates);
-      this.log.info(`[MediaLog] Storing to S3 bucket: ${BUCKET_NAME}, key: ${key}.gz`);
       await this.#storeLogFile(key, contents, {
         [META_LAST_EVENT]: DateFormat.format(new Date(lastEventTime)),
       });
 
-      this.log.info(`[MediaLog] Successfully appended ${updates.length} media events to ${key}.gz in bucket ${BUCKET_NAME}`);
+      this.log.info(`Appended ${updates.length} media events to ${key}`);
       return `${key}.gz`;
     }
-    this.log.warn('[MediaLog] No updates to append');
     return null;
   }
 
