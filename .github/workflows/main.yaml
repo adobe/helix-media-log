@@ -22,7 +22,7 @@ jobs:
       - name: Use Node.js 22.x
         uses: actions/setup-node@v5
         with:
-          node-version: '22.x'
+          node-version: '24.x'
       - run: npm install
       - run: npm test
       - uses: codecov/codecov-action@v5
@@ -39,7 +39,7 @@ jobs:
       - name: Use Node.js 22.x
         uses: actions/setup-node@v5
         with:
-          node-version: '22.x'
+          node-version: '24.x'
       - run: npm install
 
       - name: Configure AWS Credentials
@@ -72,7 +72,7 @@ jobs:
       - name: Use Node.js 22.x
         uses: actions/setup-node@v5
         with:
-          node-version: '22.x'
+          node-version: '24.x'
       - run: npm install
 
       - name: Configure AWS Credentials
