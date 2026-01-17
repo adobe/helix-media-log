@@ -73,8 +73,9 @@ function addMessage(message, key, projects) {
     projects[key] = project;
   }
   // Remove contentBusId from the update since it's already at the message body level
-  // const { contentBusId, ...update } = message;
-  project.updates.push(message);
+  // eslint-disable-next-line no-unused-vars
+  const { contentBusId, ...update } = message;
+  project.updates.push(update);
 }
 
 /**
