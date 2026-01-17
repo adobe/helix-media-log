@@ -1,6 +1,6 @@
 {
   "name": "@adobe/helix-media-log",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
   "description": "Helix Media Log",
   "main": "src/index.js",
@@ -89,6 +89,5 @@
   "lint-staged": {
     "*.js": "eslint",
     "*.cjs": "eslint"
-
   }
 }
