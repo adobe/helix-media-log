@@ -57,8 +57,8 @@
     "@adobe/helix-shared-utils": "3.0.2",
     "@adobe/helix-shared-wrap": "2.0.2",
     "@adobe/helix-status": "10.1.5",
-    "@aws-sdk/client-s3": "3.996.0",
-    "@aws-sdk/client-sqs": "3.996.0"
+    "@aws-sdk/client-s3": "3.1000.0",
+    "@aws-sdk/client-sqs": "3.1000.0"
   },
   "devDependencies": {
     "@adobe/eslint-config-helix": "3.0.21",
@@ -76,7 +76,7 @@
     "esmock": "2.7.3",
     "husky": "9.1.7",
     "junit-report-builder": "5.1.1",
-    "lint-staged": "16.2.7",
+    "lint-staged": "16.3.1",
     "mocha": "11.7.5",
     "mocha-multi-reporters": "1.5.1",
     "mocha-suppress-logs": "0.6.0",
