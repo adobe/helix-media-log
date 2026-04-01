@@ -1,3 +1,10 @@
+## [1.1.18](https://github.com/adobe/helix-media-log/compare/v1.1.17...v1.1.18) (2026-04-01)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @adobe/helix-shared-body-data to v2.2.4 ([#37](https://github.com/adobe/helix-media-log/issues/37)) ([c4d0526](https://github.com/adobe/helix-media-log/commit/c4d0526360875f229b71fad7c0727c55bfda0c8b))
+
 ## [1.1.17](https://github.com/adobe/helix-media-log/compare/v1.1.16...v1.1.17) (2026-03-31)
 
 
