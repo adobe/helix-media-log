@@ -1,3 +1,10 @@
+## [1.1.25](https://github.com/adobe/helix-media-log/compare/v1.1.24...v1.1.25) (2026-04-30)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @adobe/helix-shared-tokencache to v1.5.1 ([#50](https://github.com/adobe/helix-media-log/issues/50)) ([6752fd4](https://github.com/adobe/helix-media-log/commit/6752fd4d238ddd7317deba372f89ebb21e3421db))
+
 ## [1.1.24](https://github.com/adobe/helix-media-log/compare/v1.1.23...v1.1.24) (2026-04-28)
 
 
