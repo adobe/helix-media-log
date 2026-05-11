@@ -1,3 +1,10 @@
+## [1.1.27](https://github.com/adobe/helix-media-log/compare/v1.1.26...v1.1.27) (2026-05-11)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @adobe/helix-admin-support to v5.1.1 ([#52](https://github.com/adobe/helix-media-log/issues/52)) ([e1e31fc](https://github.com/adobe/helix-media-log/commit/e1e31fcff36a2f660d08ec45a00dfa207d86e027))
+
 ## [1.1.26](https://github.com/adobe/helix-media-log/compare/v1.1.25...v1.1.26) (2026-05-05)
 
 
