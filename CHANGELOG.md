@@ -1,3 +1,10 @@
+## [1.1.31](https://github.com/adobe/helix-media-log/compare/v1.1.30...v1.1.31) (2026-05-21)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @adobe/helix-shared-secrets to v2.3.3 ([#58](https://github.com/adobe/helix-media-log/issues/58)) ([430e1f2](https://github.com/adobe/helix-media-log/commit/430e1f28af2a3ec5eb1adee3b5efdebc578719b9))
+
 ## [1.1.30](https://github.com/adobe/helix-media-log/compare/v1.1.29...v1.1.30) (2026-05-19)
 
 
