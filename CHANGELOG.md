@@ -1,3 +1,10 @@
+## [1.1.40](https://github.com/adobe/helix-media-log/compare/v1.1.39...v1.1.40) (2026-07-15)
+
+
+### Bug Fixes
+
+* **deps:** update adobe fixes ([#69](https://github.com/adobe/helix-media-log/issues/69)) ([6fed594](https://github.com/adobe/helix-media-log/commit/6fed594fec48003edd74d148e6084c7057b0f8b8))
+
 ## [1.1.39](https://github.com/adobe/helix-media-log/compare/v1.1.38...v1.1.39) (2026-07-07)
 
 
