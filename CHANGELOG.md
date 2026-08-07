@@ -1,3 +1,10 @@
+## [1.1.43](https://github.com/adobe/helix-media-log/compare/v1.1.42...v1.1.43) (2026-08-07)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @adobe/fetch to v4.3.1 ([#73](https://github.com/adobe/helix-media-log/issues/73)) ([5b33842](https://github.com/adobe/helix-media-log/commit/5b33842474a7f848e04e2bf9b7c7da110aaff411))
+
 ## [1.1.42](https://github.com/adobe/helix-media-log/compare/v1.1.41...v1.1.42) (2026-08-04)
 
 
