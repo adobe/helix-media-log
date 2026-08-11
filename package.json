@@ -57,15 +57,15 @@
     "@adobe/helix-shared-utils": "3.0.2",
     "@adobe/helix-shared-wrap": "2.0.2",
     "@adobe/helix-status": "10.1.5",
-    "@aws-sdk/client-s3": "3.1091.0",
-    "@aws-sdk/client-sqs": "3.1091.0"
+    "@aws-sdk/client-s3": "3.1096.0",
+    "@aws-sdk/client-sqs": "3.1096.0"
   },
   "devDependencies": {
     "@adobe/eslint-config-helix": "3.0.29",
     "@adobe/helix-deploy": "13.5.8",
     "@adobe/helix-universal": "5.4.3",
     "@adobe/helix-universal-devserver": "1.1.149",
-    "@eslint/config-helpers": "0.6.0",
+    "@eslint/config-helpers": "0.7.0",
     "@semantic-release/changelog": "6.0.3",
     "@semantic-release/exec": "7.1.0",
     "@semantic-release/git": "10.0.1",
