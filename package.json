@@ -77,7 +77,7 @@
     "junit-report-builder": "5.1.2",
     "lint-staged": "16.4.0",
     "mocha": "11.8.0",
-    "mocha-multi-reporters": "1.5.1",
+    "mocha-multi-reporters": "1.5.2",
     "mocha-suppress-logs": "0.6.0",
     "nock": "13.5.6",
     "nodemon": "3.1.14",
