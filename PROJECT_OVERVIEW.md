@@ -236,7 +236,7 @@ npm run deploy-ci      # CI deployment
     "name": "helix3/media-log@${version}",
     "memory": 1024,
     "timeout": "300000",
-    "awsRole": "arn:aws:iam::118435662149:role/helix-service-role-s3-rw",
+    "awsRole": "${env.HLX_LAMBDA_ROLE}",
     "testUrl": "/_status_check/healthcheck.json",
     "awsAttachAuthorizer": "helix-token-authorizer_v2",
     "target": "aws"

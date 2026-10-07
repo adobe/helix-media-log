@@ -6,6 +6,7 @@ env:
   CIRCLE_BRANCH: ${{ github.ref_name }}
   AWS_DEPLOY_ROLE: arn:aws:iam::118435662149:role/helix-gh-deploy-config-service
   AWS_DEPLOY_SECRET_ID: /helix/github-action-secrets
+  HLX_LAMBDA_ROLE: helix-service-role-s3-rw
 
 permissions:
   id-token: write
