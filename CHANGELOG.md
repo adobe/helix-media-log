@@ -1,3 +1,31 @@
+## [1.1.55](https://github.com/adobe/helix-media-log/compare/v1.1.54...v1.1.55) (2026-10-27)
+
+
+### Bug Fixes
+
+* **deps:** update external fixes to v3.1150.0 ([#93](https://github.com/adobe/helix-media-log/issues/93)) ([c41e61d](https://github.com/adobe/helix-media-log/commit/c41e61d8dde218ee210c35cdf05ee4809f8eac39))
+
+## [1.1.54](https://github.com/adobe/helix-media-log/compare/v1.1.53...v1.1.54) (2026-10-21)
+
+
+### Bug Fixes
+
+* **deps:** update adobe fixes ([#91](https://github.com/adobe/helix-media-log/issues/91)) ([792e157](https://github.com/adobe/helix-media-log/commit/792e1572a35c91808761e4f4b4d2ac64063b8f8e))
+
+## [1.1.53](https://github.com/adobe/helix-media-log/compare/v1.1.52...v1.1.53) (2026-10-14)
+
+
+### Bug Fixes
+
+* **deps:** update external fixes to v3.1143.0 ([#89](https://github.com/adobe/helix-media-log/issues/89)) ([babdadd](https://github.com/adobe/helix-media-log/commit/babdadd9d35d8c680e6c0e59ddd02f85c78b5e12))
+
+## [1.1.52](https://github.com/adobe/helix-media-log/compare/v1.1.51...v1.1.52) (2026-10-12)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @adobe/fetch to v4.3.2 ([#88](https://github.com/adobe/helix-media-log/issues/88)) ([722c59e](https://github.com/adobe/helix-media-log/commit/722c59e0b03e554f6dc2f50161a11978426c7f45))
+
 ## [1.1.51](https://github.com/adobe/helix-media-log/compare/v1.1.50...v1.1.51) (2026-10-06)
 
 
