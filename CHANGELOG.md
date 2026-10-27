@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/adobe/helix-media-log/compare/v1.1.55...v1.2.0) (2026-10-27)
+
+
+### Features
+
+* use shared workflow ([b1f5452](https://github.com/adobe/helix-media-log/commit/b1f54522f88cb7e5a8d662222989453213453485))
+
 ## [1.1.55](https://github.com/adobe/helix-media-log/compare/v1.1.54...v1.1.55) (2026-10-27)
 
 
