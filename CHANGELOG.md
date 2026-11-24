@@ -1,3 +1,10 @@
+## [1.2.2](https://github.com/adobe/helix-media-log/compare/v1.2.1...v1.2.2) (2026-11-24)
+
+
+### Bug Fixes
+
+* **deps:** update external fixes to v3.1165.0 ([#103](https://github.com/adobe/helix-media-log/issues/103)) ([ad7dcab](https://github.com/adobe/helix-media-log/commit/ad7dcab95369032a55f8c46990cec8b3eab0ae31))
+
 ## [1.2.1](https://github.com/adobe/helix-media-log/compare/v1.2.0...v1.2.1) (2026-11-17)
 
 
